@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extracted Text</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+            <h1 class="text-3xl font-semibold text-center text-green-600 mb-6">Extracted Text</h1>
+            
+            <div class="mb-4">
+                <p class="text-gray-800 text-lg whitespace-pre-wrap">{{ extracted_text }}</p>
+            </div>
+
+            <div class="flex justify-center">
+                <a href="/" class="bg-blue-500 text-white px-6 py-3 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300">Upload Another Image</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Créer un Compte</title>
+</head>
+<body class="bg-gray-100">
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="bg-white p-8 rounded shadow-md w-96">
+            <h1 class="text-2xl font-bold mb-4 text-center">Créer un Compte</h1>
+            {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                    <div class="mb-4">
+                        {% for category, message in messages %}
+                            <div class="bg-{{ category }}-100 border border-{{ category }}-400 text-{{ category }}-700 px-4 py-3 rounded relative" role="alert">
+                                <strong class="font-bold">{{ message }}</strong>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            <form method="POST" id="registrationForm" onsubmit="showLoading()">
+                <div class="mb-4 relative">
+                    <label class="block text-sm font-medium mb-2" for="prenom">Prénom</label>
+                    <i class="fas fa-user absolute left-3 top-10 text-indigo-600"></i>
+                    <input type="text" placeholder="Entrez votre prénom" name="prenom" id="prenom" required class="border border-gray-300 p-2 rounded w-full pl-10 focus:outline-none focus:ring focus:ring-indigo-600">
+                </div>
+                <div class="mb-4 relative">
+                    <label class="block text-sm font-medium mb-2" for="nom">Nom</label>
+                    <i class="fas fa-user absolute left-3 top-10 text-indigo-600"></i>
+                    <input type="text" placeholder="Entrez votre nom" name="nom" id="nom" required class="border border-gray-300 p-2 rounded w-full pl-10 focus:outline-none focus:ring focus:ring-indigo-600">
+                </div>
+                <div class="mb-4 relative">
+                    <label class="block text-sm font-medium mb-2" for="email">Email</label>
+                    <i class="fas fa-envelope absolute left-3 top-10 text-indigo-600"></i>
+                    <input type="email" placeholder="Entrez votre email" name="email" id="email" required class="border border-gray-300 p-2 rounded w-full pl-10 focus:outline-none focus:ring focus:ring-indigo-600">
+                </div>
+                <div class="mb-4 relative">
+                    <label class="block text-sm font-medium mb-2" for="password">Mot de passe</label>
+                    <i class="fas fa-lock absolute left-3 top-10 text-indigo-600"></i>
+                    <input type="password" placeholder="Entrez votre mot de passe" name="password" id="password" required class="border border-gray-300 p-2 rounded w-full pl-10 focus:outline-none focus:ring focus:ring-indigo-600">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2" for="role">Rôle</label>
+                    <select name="role" id="role" required class="border border-gray-300 p-2 rounded w-full focus:outline-none focus:ring focus:ring-indigo-600">
+                        <option value="admin">Administrateur</option>
+                        <option value="user">Utilisateur</option>
+                    </select>
+                </div>
+                <button type="submit" id="submitButton" class="bg-indigo-600 text-white p-2 rounded w-full hover:bg-indigo-600 transition">
+                    <span id="buttonText">Créer un Compte</span>
+                    <span id="loadingSpinner" class="hidden spinner-border animate-spin ml-2 border-t-2 border-white w-4 h-4"></span>
+                </button>
+            </form>
+            <p class="mt-4 text-center">
+                Déjà un compte ? <a href="{{ url_for('login') }}" class="text-indigo-600">Connectez-vous</a>
+            </p>
+        </div>
+    </div>
+
+    <style>
+        .spinner-border {
+            border-radius: 50%;
+            border-width: 2px;
+            border-style: solid;
+        }
+    </style>
+
+    <script>
+        function showLoading() {
+            const buttonText = document.getElementById('buttonText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            buttonText.classList.add('invisible');
+            loadingSpinner.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
