@@ -70,30 +70,31 @@ def load_user(user_id):
 def index():
     return render_template('index.html')
 
-# Route pour traiter le téléchargement de fichiers
+# Route pour traiter le téléchargement de plusieurs fichiers
 @app.route('/upload', methods=['POST'])
-def upload_file():
+def upload_files():
     if 'file' not in request.files:
         return redirect(request.url)
-    
-    file = request.files['file']
-    
-    # Vérifier si le fichier est valide
-    if file and allowed_file(file.filename):
-        filename = file.filename
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        
-        # Sauvegarder le fichier téléchargé
-        file.save(file_path)
-        
-        # Extraire le texte de l'image avec Tesseract
-        image = Image.open(file_path)
-        extracted_text = pytesseract.image_to_string(image)
-        
-        return render_template('result.html', extracted_text=extracted_text)
-    else:
-        return 'File type not allowed!'
 
+    files = request.files.getlist('file')  # Récupérer plusieurs fichiers
+    all_extracted_text = ""  # Stocker tout le texte extrait
+
+    for file in files:
+        if file and allowed_file(file.filename):
+            filename = file.filename
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            
+            # Sauvegarder chaque fichier téléchargé
+            file.save(file_path)
+            
+            # Extraire le texte de l'image avec Tesseract
+            image = Image.open(file_path)
+            extracted_text = pytesseract.image_to_string(image)
+
+            # Concaténer les résultats
+            all_extracted_text += extracted_text + "\n\n"
+
+    return render_template('result.html', extracted_text=all_extracted_text.strip())  # Supprimer les espaces inutiles
 
 @app.route('/admin')
 def home():
@@ -168,6 +169,8 @@ def enseignant():
 def filiere():
     filter_code = request.args.get('filter_code')
     filter_nom = request.args.get('filter_nom')
+    filter_mention = request.args.get('filter_mention')
+    filter_domaine = request.args.get('filter_domaine')
 
     query = "SELECT id, code, nom, mention, domaine FROM filiere WHERE 1=1"
     filters = []
@@ -177,23 +180,24 @@ def filiere():
     if filter_nom:
         query += " AND nom LIKE %s"
         filters.append('%' + filter_nom + '%')
+    if filter_mention:
+        query += " AND nom LIKE %s"
+        filters.append('%' + filter_mention + '%')
+    if filter_domaine:
+        query += " AND nom LIKE %s"
+        filters.append('%' + filter_domaine + '%')
 
     data = fetch_data(query, filters) if filters else fetch_data(query)
     return render_template('filieres.html', title='Filières', data=data, columns=['ID', 'Code', 'Nom', 'Mention', 'Domaine'], table='filiere', user=current_user)
 
 @app.route('/users', methods=['GET'])
 def membre_administratif():
-    filter_no = request.args.get('filter_no')
     filter_nom = request.args.get('filter_nom')
     filter_prenom = request.args.get('filter_prenom')
     filter_email = request.args.get('filter_email')
 
     query = "SELECT id, nom, prenom, email, role FROM membre_administratif WHERE 1=1"
     filters = []
-
-    if filter_no:
-        query += " AND id = %s"
-        filters.append(filter_no)
     if filter_nom:
         query += " AND nom LIKE %s"
         filters.append('%' + filter_nom + '%')
@@ -205,11 +209,10 @@ def membre_administratif():
         filters.append('%' + filter_email + '%')
 
     data = fetch_data(query, filters) if filters else fetch_data(query)
-    return render_template('users.html', title='Membres Administratifs', data=data, columns=['ID', 'Nom', 'Prénom', 'Email', 'Rôle'], table='membre_administratif', user=current_user)
+    return render_template('users.html', title='Utilisateurs', data=data, columns=['ID', 'Nom', 'Prénom', 'Email', 'Rôle'], table='membre_administratif', user=current_user)
 
 @app.route('/notes', methods=['GET'])
 def note():
-    filter_id = request.args.get('filter_id')
     filter_enseignant = request.args.get('filter_enseignant')
     filter_etudiant = request.args.get('filter_etudiant')
     filter_ue = request.args.get('filter_ue')
@@ -223,10 +226,6 @@ def note():
         WHERE 1=1
     """
     filters = []
-
-    if filter_id:
-        query += " AND n.id = %s"
-        filters.append(filter_id)
     if filter_enseignant:
         query += " AND e.nom LIKE %s"
         filters.append('%' + filter_enseignant + '%')
@@ -242,30 +241,31 @@ def note():
 
 @app.route('/parcours', methods=['GET'])
 def parcours_etudiant():
-    filter_id = request.args.get('filter_id')
     filter_matricule = request.args.get('filter_matricule')
     filter_annee = request.args.get('filter_annee')
+    filter_annee_etude = request.args.get('filter_annee_etude')
 
     query = """
-        SELECT p.id, p.etudiant_matricule, a.annee, p.decision
+        SELECT p.id, p.etudiant_matricule, a.annee, ae.code, p.decision
         FROM parcours_etudiant p
         JOIN annee_academique a ON p.annee_academique_id = a.id
+        JOIN annee_etude ae ON p.annee_etude_id = ae.id
         WHERE 1=1
     """
     filters = []
 
-    if filter_id:
-        query += " AND p.id = %s"
-        filters.append(filter_id)
     if filter_matricule:
         query += " AND p.etudiant_matricule LIKE %s"
         filters.append('%' + filter_matricule + '%')
     if filter_annee:
         query += " AND a.annee LIKE %s"
         filters.append('%' + filter_annee + '%')
+    if filter_annee_etude:
+        query += " AND a.annee LIKE %s"
+        filters.append('%' + filter_annee_etude + '%')
 
     data = fetch_data(query, filters) if filters else fetch_data(query)
-    return render_template('parcours.html', title='Parcours Étudiant', data=data, columns=['ID', 'Matricule', 'Année Académique', 'Décision'], table='parcours_etudiant', user=current_user)
+    return render_template('parcours.html', title='Parcours Étudiant', data=data, columns=['ID', 'Matricule', 'Année Académique', 'Année Etude', 'Décision'], table='parcours_etudiant', user=current_user)
 
 @app.route('/ues', methods=['GET'])
 def ue():
