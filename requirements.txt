@@ -1,0 +1,8 @@
+Flask
+flask-cors
+Pillow
+pytesseract
+mysql-connector-python
+Flask-Login
+Flask-Bcrypt
+Werkzeug

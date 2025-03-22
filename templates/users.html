@@ -13,7 +13,7 @@
     <div class="p-6">
         <h2 class="text-xl font-bold mb-4">Menu</h2>
         <ul>
-            <li class="mb-2 bg-indigo-600 text-gray-50 p-2 ">
+            <li class="mb-2 hover:bg-indigo-600 hover:text-gray-50 active:bg-indigo-600 active:text-gray-50 p-2 text-gray-700 ">
                 <a href="/dashboard" class="flex items-center">
                     <i class="fas fa-tachometer-alt mr-2"></i>
                     Tableau de bord
@@ -38,12 +38,30 @@
                 </a>
             </li>
             <li class="mb-2 hover:bg-indigo-600 hover:text-gray-50 active:bg-indigo-600 active:text-gray-50 p-2 text-gray-700 ">
+                <a href="/parcours" class="flex items-center">
+                    <i class="fas fa-chalkboard-teacher mr-2"></i>
+                    Gestion des parcours
+                </a>
+            </li>
+            <li class="mb-2 hover:bg-indigo-600 hover:text-gray-50 active:bg-indigo-600 active:text-gray-50 p-2 text-gray-700 ">
                 <a href="/notes" class="flex items-center">
                     <i class="fas fa-pencil-alt mr-2"></i>
                     Gestion des notes
                 </a>
             </li>
             <li class="mb-2 hover:bg-indigo-600 hover:text-gray-50 active:bg-indigo-600 active:text-gray-50 p-2 text-gray-700 ">
+                <a href="/enseignants" class="flex items-center">
+                    <i class="fas fa-user mr-2"></i>
+                    Gestion des enseignants
+                </a>
+            </li>
+            <li class="mb-2 hover:bg-indigo-600 hover:text-gray-50 active:bg-indigo-600 active:text-gray-50 p-2 text-gray-700 ">
+                <a href="/offres" class="flex items-center">
+                    <i class="fas fa-folder-open mr-2"></i>
+                    Gestion des Offres Forms
+                </a>
+            </li>
+            <li class="mb-2 bg-indigo-600 text-gray-50 p-2 ">
                 <a href="/users" class="flex items-center">
                     <i class="fas fa-users mr-2"></i>
                     Gestion des utilisateurs
@@ -60,7 +78,7 @@
         <!-- Barre supérieure -->
         <div class="flex justify-between items-center mb-6 bg-white shadow-md p-4 rounded">
             <div>
-                <h1 class="text-3xl font-bold">{{ title }}</h1>
+                <h1 class="text-2xl font-bold"><i class="fas fa-user text-indigo-600"></i> {{ title }}</h1>
             </div>
             <div class="text-gray-600">
                 <span class="mr-4">Utilisateur : <strong>{{ user.email }}</strong></span>
@@ -69,25 +87,76 @@
         </div>
             <div class="flex bg-gray-100 p-6 rounded-lg shadow-md">
                 <div class="w-1/3 flex flex-col items-center justify-center border-r-2  mr-10">
-                    <div class="bg-blue-200 p-4 rounded-full">
-                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <div class="bg-indigo-200 p-4 rounded-full">
+                        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
                         </svg>
                     </div>
-                    <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">Ajouter</button>
+                    <button class="add-button mt-4 bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition">Ajouter</button>
+                </div>
+
+                <div id="modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden">
+                    <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
+                        <h2 class="text-xl font-bold mb-4">Enregistrer un utilisateur</h2>
+                        {% with messages = get_flashed_messages(with_categories=True) %}
+                            {% if messages %}
+                                <div class="mb-4">
+                                    {% for category, message in messages %}
+                                        <div class="bg-{{ category }}-100 border border-{{ category }}-400 text-{{ category }}-700 px-4 py-3 rounded relative" role="alert">
+                                            <strong class="font-bold">{{ message }}</strong>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        {% endwith %}
+                        <form id="modal-form" action="{{ url_for('add_user') }}"  onsubmit="showLoading()" method="POST">
+                            <div class="mb-4 relative">
+                                <label class="block text-sm font-medium mb-2" for="prenom">Prénom</label>
+                                <i class="fas fa-user absolute left-3 top-10 text-indigo-600"></i>
+                                <input type="text" placeholder="Entrez votre prénom" name="prenom" id="prenom" required class="border border-gray-300 p-2 rounded w-full pl-10 focus:outline-none focus:ring focus:ring-indigo-600">
+                            </div>
+                            <div class="mb-4 relative">
+                                <label class="block text-sm font-medium mb-2" for="nom">Nom</label>
+                                <i class="fas fa-user absolute left-3 top-10 text-indigo-600"></i>
+                                <input type="text" placeholder="Entrez votre nom" name="nom" id="nom" required class="border border-gray-300 p-2 rounded w-full pl-10 focus:outline-none focus:ring focus:ring-indigo-600">
+                            </div>
+                            <div class="mb-4 relative">
+                                <label class="block text-sm font-medium mb-2" for="email">Email</label>
+                                <i class="fas fa-envelope absolute left-3 top-10 text-indigo-600"></i>
+                                <input type="email" placeholder="Entrez votre email" name="email" id="email" required class="border border-gray-300 p-2 rounded w-full pl-10 focus:outline-none focus:ring focus:ring-indigo-600">
+                            </div>
+                            <div class="mb-4 relative">
+                                <label class="block text-sm font-medium mb-2" for="password">Mot de passe</label>
+                                <i class="fas fa-lock absolute left-3 top-10 text-indigo-600"></i>
+                                <input type="password" placeholder="Entrez votre mot de passe" name="password" id="password" required class="border border-gray-300 p-2 rounded w-full pl-10 focus:outline-none focus:ring focus:ring-indigo-600">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2" for="role">Rôle</label>
+                                <select name="role" id="role" required class="border border-gray-300 p-2 rounded w-full focus:outline-none focus:ring focus:ring-indigo-600">
+                                    <option value="Admin">Administrateur</option>
+                                    <option value="Enseignant">Enseignant</option>
+                                    <option value="Secrétaire">Secrétaire</option>
+                                </select>
+                            </div>
+                            <button type="submit" id="submitButton" class="bg-indigo-600 text-white p-2 rounded w-full hover:bg-indigo-600 transition">
+                                <span id="buttonText">Créer un Compte</span>
+                                <span id="loadingSpinner" class="hidden spinner-border animate-spin ml-2 border-t-2 border-white w-4 h-4"></span>
+                            </button>
+                        </form>
+                    </div>
                 </div>
         
                 <form class="w-2/3 grid grid-cols-1 md:grid-cols-2 gap-2" method="GET" action="{{ url_for(table) }}">
                     <div class="flex flex-col">
                         <label class="text-sm font-semibold text-gray-700">Nom</label>
-                        <input type="text" name="filter_nom" class="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Filtrer par nom">
+                        <input type="text" name="filter_nom" class="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Filtrer par nom">
                     </div>
                     <div class="flex flex-col">
                         <label class="text-sm font-semibold text-gray-700">Prénom</label>
-                        <input type="text" name="filter_prenom" class="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Filtrer par prénom">
+                        <input type="text" name="filter_prenom" class="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Filtrer par prénom">
                     </div>
                     <div class="flex flex-col">
-                        <button type="submit" class="w-full bg-blue-600 text-white rounded-lg p-2 hover:bg-blue-700 transition">
+                        <button type="submit" class="w-full bg-indigo-600 text-white rounded-lg p-2 hover:bg-indigo-700 transition">
                             Rechercher
                         </button>
                     </div>
@@ -113,10 +182,10 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item }}</td>
                         {% endfor %}
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            <a href="" class="text-blue-600 hover:text-blue-900 mr-2">
+                            <a href="" class="text-indigo-600 hover:text-indigo-900 mr-2">
                                 <i class="fas fa-edit text-lg"></i>
                             </a>
-                            <a href="" class="text-red-600 hover:text-red-900">
+                            <a href="{{ url_for('delete_membre_administratif', id=row[0]) }}" class="text-red-600 hover:text-red-900">
                                 <i class="fas fa-trash-alt text-lg"></i>
                             </a>
                         </td>
@@ -127,4 +196,32 @@
         </div>
     </div>
 </body>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const modal = document.getElementById("modal");
+        const closeModal = document.getElementById("close-modal");
+        const addButtons = document.querySelectorAll(".add-button");
+    
+        // Ouvrir le modal au clic sur "Ajouter"
+        addButtons.forEach(button => {
+            button.addEventListener("click", function () {
+                modal.classList.remove("hidden");
+            });
+        });
+    
+        // Fermer le modal
+        closeModal.addEventListener("click", function () {
+            modal.classList.add("hidden");
+        });
+    
+        // Gérer la soumission du formulaire (vous pouvez ajouter une requête AJAX ici)
+        document.getElementById("modal-form").addEventListener("submit", function (event) {
+            event.preventDefault();
+            alert("Données envoyées !");
+            modal.classList.add("hidden");
+        });
+    });
+</script>
+    
 </html>

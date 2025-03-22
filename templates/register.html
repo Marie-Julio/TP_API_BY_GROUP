@@ -46,8 +46,9 @@
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-2" for="role">Rôle</label>
                     <select name="role" id="role" required class="border border-gray-300 p-2 rounded w-full focus:outline-none focus:ring focus:ring-indigo-600">
-                        <option value="admin">Administrateur</option>
-                        <option value="user">Utilisateur</option>
+                        <option value="Admin">Administrateur</option>
+                        <option value="Enseignant">Enseignant</option>
+                        <option value="Secrétaire">Secrétaire</option>
                     </select>
                 </div>
                 <button type="submit" id="submitButton" class="bg-indigo-600 text-white p-2 rounded w-full hover:bg-indigo-600 transition">
@@ -56,7 +57,7 @@
                 </button>
             </form>
             <p class="mt-4 text-center">
-                Déjà un compte ? <a href="{{ url_for('login') }}" class="text-indigo-600">Connectez-vous</a>
+                Déjà un compte ? <a href="/" class="text-indigo-600">Connectez-vous</a>
             </p>
         </div>
     </div>
